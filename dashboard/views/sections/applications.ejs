@@ -1,0 +1,17 @@
+<p class="section-desc">Panels created with <code>/application-panel</code>. Submissions shown here.</p>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Applicant</th><th>Status</th><th>Reviewed by</th><th>Submitted</th></tr></thead>
+    <tbody>
+      <% recentApplications.forEach(a => { %>
+        <tr>
+          <td><%= a.userId %></td>
+          <td><span class="badge <%= a.status === 'pending' ? 'warning' : a.status === 'accepted' ? 'success' : 'neutral' %>"><%= a.status %></span></td>
+          <td><%= a.reviewedBy || '—' %></td>
+          <td><%= a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '—' %></td>
+        </tr>
+      <% }) %>
+      <% if (!recentApplications.length) { %><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">No applications yet.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>

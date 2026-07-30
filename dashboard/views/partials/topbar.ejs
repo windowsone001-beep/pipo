@@ -1,0 +1,20 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="btn secondary sm mobile-nav-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="breadcrumbs"><%- typeof breadcrumb !== 'undefined' ? breadcrumb : '' %></div>
+  </div>
+  <div class="topbar-right">
+    <% if (typeof user !== 'undefined' && user) { %>
+      <% if (user.isOwner) { %>
+        <a class="btn ghost sm" href="/admin">Admin</a>
+      <% } %>
+      <div class="user-chip">
+        <img src="<%= user.avatar %>" alt="">
+        <span><%= user.username %></span>
+      </div>
+      <form method="POST" action="/auth/logout" style="margin:0">
+        <button class="btn ghost sm" type="submit" title="Log out">Log out</button>
+      </form>
+    <% } %>
+  </div>
+</header>

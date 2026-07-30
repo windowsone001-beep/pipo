@@ -1,0 +1,18 @@
+<p class="section-desc">Panels, categories, buttons, and roles are configured with <code>/ticket-panel</code> in Discord. This view shows live ticket activity and stats.</p>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Status</th><th>Opened by</th><th>Claimed by</th><th>Opened</th></tr></thead>
+    <tbody>
+      <% recentTickets.forEach(t => { %>
+        <tr>
+          <td>#<%= t.ticketNumber ?? '—' %></td>
+          <td><span class="badge <%= t.status === 'open' ? 'success' : 'neutral' %>"><%= t.status %></span></td>
+          <td><%= t.openerId %></td>
+          <td><%= t.claimedBy || '—' %></td>
+          <td><%= t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '—' %></td>
+        </tr>
+      <% }) %>
+      <% if (!recentTickets.length) { %><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No tickets yet.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>

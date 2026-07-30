@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { pageTitle: 'Home' }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar-servers', { guilds }) %>
+    <div class="main">
+      <%- include('partials/topbar', { breadcrumb: 'Home', user }) %>
+
+      <div class="page">
+        <!-- ============ PROFILE HEADER ============ -->
+        <div class="profile-card glass">
+          <div class="profile-banner" style="<%= user.banner ? `background-image:url('${user.banner}')` : `background:linear-gradient(120deg, var(--purple-deep), var(--purple-dim))` %>"></div>
+          <div class="profile-body">
+            <img class="profile-avatar" src="<%= user.avatar %>" alt="">
+            <div class="profile-info">
+              <h1><%= user.username %></h1>
+              <div class="profile-handle">@<%= user.handle %> &middot; <%= user.id %></div>
+              <div class="profile-badges">
+                <% if (user.isOwner) { %><span class="badge purple"><i class="fa-solid fa-crown"></i> Bot Owner</span><% } %>
+                <% badges.forEach(b => { %>
+                  <span class="badge neutral" title="<%= b.label %>"><i class="<%= b.icon %>"></i> <%= b.label %></span>
+                <% }) %>
+                <% if (!badges.length && !user.isOwner) { %><span class="badge neutral"><i class="fa-solid fa-user"></i> Member</span><% } %>
+              </div>
+            </div>
+            <div class="profile-actions">
+              <a class="btn secondary sm" href="/auth/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log out</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid cols-3" style="align-items:stretch;margin-top:20px">
+          <!-- ============ WALLET / CREDITS ============ -->
+          <div class="panel" style="margin-bottom:0">
+            <div class="panel-head">
+              <div><h2><i class="fa-solid fa-sack-dollar"></i> Credits</h2><div class="desc">Earned from your daily reward.</div></div>
+            </div>
+            <div class="kpi-value" style="font-size:36px;margin-bottom:6px"><%= (wallet.credits || 0).toLocaleString() %></div>
+            <div class="text-muted" style="font-size:12.5px;margin-bottom:18px"><i class="fa-solid fa-fire" style="color:var(--warning)"></i> <%= wallet.dailyStreak || 0 %> day streak</div>
+
+            <% if (canClaim) { %>
+              <form method="POST" action="/dashboard/daily-claim">
+                <button class="btn w-full" type="submit"><i class="fa-solid fa-gift"></i> Claim +<%= dailyReward %> daily credits</button>
+              </form>
+            <% } else { %>
+              <button class="btn secondary w-full" type="button" disabled id="daily-btn">
+                <i class="fa-solid fa-clock"></i> <span id="daily-countdown">Claimed — check back later</span>
+              </button>
+            <% } %>
+          </div>
+
+          <!-- ============ QUICK STATS ============ -->
+          <div class="panel" style="margin-bottom:0;grid-column:span 2">
+            <div class="panel-head"><div><h2><i class="fa-solid fa-gauge-high"></i> At a glance</h2></div></div>
+            <div class="grid cols-3">
+              <div class="kpi-card">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-server"></i></div></div>
+                <div class="kpi-value"><%= guilds.length %></div>
+                <div class="kpi-label">Servers you manage</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-shield"></i></div></div>
+                <div class="kpi-value"><%= user.isOwner ? 'Owner' : 'Staff' %></div>
+                <div class="kpi-label">Access level</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></div></div>
+                <div class="kpi-value"><%= activity.length %></div>
+                <div class="kpi-label">Recent activity events</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ACTIVITY HISTORY ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2><i class="fa-solid fa-timeline"></i> Recent activity</h2><div class="desc">Real actions pulled from your servers\' mod logs, tickets, and applications.</div></div>
+          </div>
+          <% if (activity.length) { %>
+            <div class="activity-list">
+              <% activity.forEach(ev => { %>
+                <div class="activity-item">
+                  <div class="activity-ic"><i class="<%= ev.icon %>"></i></div>
+                  <div class="activity-body">
+                    <div class="activity-text"><%= ev.text %></div>
+                    <div class="activity-meta"><%= guildNameById[ev.guildId] || 'Unknown server' %> &middot; <%= ev.createdAt ? new Date(ev.createdAt).toLocaleString() : '' %></div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <div class="ic"><i class="fa-solid fa-inbox"></i></div>
+              <h3>No activity yet</h3>
+              <p>Once you take moderation actions, open tickets, or submit applications in a server Vaylex manages, they'll show up here.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- ============ SERVER GRID (also reachable via sidebar) ============ -->
+        <div class="panel-head" style="margin:8px 0 16px"><h2><i class="fa-solid fa-server"></i> Your servers</h2></div>
+        <% if (guilds.length) { %>
+          <div class="grid cols-3">
+            <% guilds.forEach(g => { %>
+              <a style="display:block;text-decoration:none" href="/dashboard/<%= g.id %>/overview">
+                <div class="card link-card server-card">
+                  <div class="server-icon">
+                    <% if (g.icon) { %><img src="<%= g.icon %>" alt=""><% } else { %><%= g.name.charAt(0).toUpperCase() %><% } %>
+                  </div>
+                  <div class="meta">
+                    <div class="name"><%= g.name %></div>
+                    <div class="sub"><%= (g.memberCount || 0).toLocaleString() %> members</div>
+                  </div>
+                  <div class="go"><i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="ic"><i class="fa-solid fa-server"></i></div>
+            <h3>No manageable servers found</h3>
+            <p>Either Vaylex isn\'t in any server you manage yet, or the bot process is offline. Invite the bot to a server where you have Manage Server permission, then refresh.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <form id="logout-form" method="POST" action="/auth/logout" style="display:none"></form>
+
+  <% if (typeof nextClaimAt !== 'undefined' && nextClaimAt) { %>
+  <script>
+    const target = new Date(<%- JSON.stringify(nextClaimAt) %>).getTime();
+    const el = document.getElementById('daily-countdown');
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) { location.reload(); return; }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      if (el) el.textContent = `Next claim in ${h}h ${m}m ${s}s`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  </script>
+  <% } %>
+  <script src="/app.js"></script>
+</body>
+</html>

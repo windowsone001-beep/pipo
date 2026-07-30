@@ -1,0 +1,12 @@
+<p class="section-desc">Reaction roles, level roles, and button roles are managed via slash commands in Discord. Auto-role on join is configurable here.</p>
+<form method="POST" action="/api/guilds/<%= guildId %>/autorole">
+  <div class="panel">
+    <div class="toggle-row">
+      <div><div class="label">Enable auto role</div><div class="desc">Automatically assign roles when a member joins</div></div>
+      <input type="checkbox" class="switch" name="autoRoleEnabled" <%= cfg.autoRole.enabled ? 'checked' : '' %>>
+    </div>
+    <label>Role IDs (comma separated)</label>
+    <input type="text" name="autoRoleIds" value="<%= cfg.autoRole.roles.join(',') %>" placeholder="123456789012345678, 234567890123456789">
+  </div>
+  <div class="form-actions"><button class="btn" type="submit">Save roles</button></div>
+</form>

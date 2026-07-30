@@ -1,0 +1,24 @@
+<p class="section-desc">Auto-moderation modules. Thresholds are tuned globally in <code>config/config.js</code> for now.</p>
+<form method="POST" action="/api/guilds/<%= guildId %>/security">
+  <div class="panel">
+    <% const modules = [
+      ['antiSpam','Anti-Spam','fa-solid fa-comment-slash','Auto-punish message flooding'],
+      ['antiLink','Anti-Link','fa-solid fa-link-slash','Remove non-whitelisted links'],
+      ['antiInvite','Anti-Invite','fa-solid fa-ban','Remove Discord invite links'],
+      ['antiEveryone','Anti-Everyone','fa-solid fa-at','Block unauthorized @everyone/@here'],
+      ['antiBot','Anti-Bot','fa-solid fa-robot','Kick unauthorized bots on join'],
+      ['antiWebhook','Anti-Webhook','fa-solid fa-plug-circle-xmark','Alert on webhook changes'],
+      ['antiRaid','Anti-Raid','fa-solid fa-people-group','Detect join floods'],
+      ['antiChannelDeleteCreate','Anti-Nuke (Channels)','fa-solid fa-hashtag','Quarantine rapid channel create/delete'],
+      ['antiRoleDeleteCreate','Anti-Nuke (Roles)','fa-solid fa-masks-theater','Quarantine rapid role create/delete'],
+      ['antiServerUpdate','Anti-Server-Update','fa-solid fa-gear','Log server setting changes']
+    ]; %>
+    <% modules.forEach(([key, label, icon, desc]) => { %>
+      <div class="toggle-row">
+        <div><div class="label"><i class="<%= icon %>"></i> <%= label %></div><div class="desc"><%= desc %></div></div>
+        <input type="checkbox" class="switch" name="<%= key %>" <%= cfg.security[key].enabled ? 'checked' : '' %>>
+      </div>
+    <% }) %>
+  </div>
+  <div class="form-actions"><button class="btn" type="submit">Save security settings</button></div>
+</form>

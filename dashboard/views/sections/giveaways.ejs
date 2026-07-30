@@ -1,0 +1,18 @@
+<p class="section-desc">Started with <code>/giveaway start</code> in Discord. Live status shown here.</p>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Prize</th><th>Status</th><th>Winners</th><th>Entries</th><th>Ends</th></tr></thead>
+    <tbody>
+      <% recentGiveaways.forEach(g => { %>
+        <tr>
+          <td><%= g.prize || '—' %></td>
+          <td><span class="badge <%= g.ended ? 'neutral' : 'success' %>"><%= g.ended ? 'Ended' : 'Active' %></span></td>
+          <td><%= g.winnerCount %></td>
+          <td><%= (g.entries || []).length %></td>
+          <td><%= g.endsAt ? new Date(g.endsAt).toLocaleString() : '—' %></td>
+        </tr>
+      <% }) %>
+      <% if (!recentGiveaways.length) { %><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No giveaways yet.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>

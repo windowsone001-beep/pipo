@@ -1,0 +1,13 @@
+<p class="section-desc">Where different event logs get posted.</p>
+<form method="POST" action="/api/guilds/<%= guildId %>/logging">
+  <div class="panel">
+    <label class="mt-0">Mod log channel ID</label>
+    <input type="text" name="modLogChannel" value="<%= cfg.modLogChannel || '' %>" placeholder="Channel ID">
+    <label>Security log channel ID</label>
+    <input type="text" name="securityLogChannel" value="<%= cfg.securityLogChannel || '' %>" placeholder="Channel ID">
+    <label>Ticket log / transcript channel ID</label>
+    <input type="text" name="ticketLogChannel" value="<%= cfg.ticketLogChannel || '' %>" placeholder="Channel ID">
+    <div class="field-hint">Per-event toggles (message edits/deletes, member join/leave, role &amp; channel updates, voice, bans/kicks/timeouts) post to the mod log above — granular per-event routing isn\'t built yet.</div>
+  </div>
+  <div class="form-actions"><button class="btn" type="submit">Save logging channels</button></div>
+</form>

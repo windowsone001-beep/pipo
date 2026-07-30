@@ -1,0 +1,11 @@
+{
+  "ignore": [
+    "data/**",
+    "logs/**",
+    "node_modules/**",
+    ".git/**",
+    "dashboard/views/**"
+  ],
+  "ext": "js,mjs,cjs,json,ejs",
+  "delay": "1000"
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { pageTitle: 'Control Panel' }) %>
+</head>
+<body>
+  <nav class="landing-nav">
+    <%- include('partials/brand') %>
+    <a class="btn sm" href="/auth/login">Log in with Discord</a>
+  </nav>
+
+  <% if (error) { %>
+    <div class="error-banner">
+      <div class="alert danger"><i class="fa-solid fa-triangle-exclamation"></i>
+        <% if (error === 'oauth_failed') { %>
+          Login with Discord failed. Please try again.
+        <% } else if (error === 'missing_code') { %>
+          Discord didn't return an authorization code. Please try logging in again.
+        <% } else { %>
+          Login was cancelled or denied.
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <span class="hero-badge"><i class="fa-solid fa-bolt"></i> Live control for your Discord servers</span>
+    <h1>Command your servers<br>from <span class="accent">one dashboard</span>.</h1>
+    <p class="lead">Tickets, security, welcome messages, giveaways, roles, and live analytics for every server Vaylex manages — sign in with Discord to get started.</p>
+    <div class="hero-actions">
+      <a class="btn" href="/auth/login"><i class="fa-solid fa-lock"></i> Log in with Discord</a>
+      <a class="btn secondary" href="#features">See what's inside</a>
+    </div>
+  </div>
+
+  <div class="feature-grid" id="features">
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-ticket"></i></div>
+      <h3>Tickets</h3>
+      <p>Track open and closed tickets, volume trends, and support activity at a glance.</p>
+    </div>
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Security</h3>
+      <p>Toggle anti-raid, anti-spam, anti-nuke, and more with one click per module.</p>
+    </div>
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-hand-sparkles"></i></div>
+      <h3>Welcome &amp; Goodbye</h3>
+      <p>Customize join/leave messages with live variables — no coding required.</p>
+    </div>
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-gift"></i></div>
+      <h3>Giveaways</h3>
+      <p>See every active giveaway and total entries across your server.</p>
+    </div>
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-masks-theater"></i></div>
+      <h3>Roles</h3>
+      <p>Configure auto-roles and manage member roles in seconds.</p>
+    </div>
+    <div class="card feature-card glass">
+      <div class="ic"><i class="fa-solid fa-chart-line"></i></div>
+      <h3>Live Analytics</h3>
+      <p>Mod-action breakdowns, ticket trends, and server growth — all visualized.</p>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { pageTitle: 'Admin Overview' }) %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar-admin') %>
+    <div class="main">
+      <%- include('partials/topbar', { breadcrumb: 'Admin / Overview', user }) %>
+
+      <div class="page">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Bot owner view</div>
+            <h1>Global overview</h1>
+            <p class="desc">Aggregated across every server Vaylex is in.</p>
+          </div>
+          <div class="badge <%= botStatus.online ? 'success' : 'danger' %>">
+            <span class="dot-live"></span> Bot <%= botStatus.online ? 'online' : 'offline' %>
+          </div>
+        </div>
+
+        <!-- ===== KPI grid ===== -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-server"></i></div></div>
+            <div class="kpi-value"><%= stats.totalServers %></div>
+            <div class="kpi-label">Total Servers</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-users"></i></div></div>
+            <div class="kpi-value"><%= stats.totalMembers.toLocaleString() %></div>
+            <div class="kpi-label">Total Members (summed)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-keyboard"></i></div></div>
+            <div class="kpi-value"><%= stats.commandsTotal.toLocaleString() %></div>
+            <div class="kpi-label">Commands Executed</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-ticket"></i></div></div>
+            <div class="kpi-value"><%= stats.openTickets %></div>
+            <div class="kpi-label">Active Tickets</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+            <div class="kpi-value"><%= stats.totalWarnings %></div>
+            <div class="kpi-label">Warnings Issued</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-wifi"></i></div></div>
+            <div class="kpi-value"><%= botStatus.online ? botStatus.wsPing + 'ms' : '—' %></div>
+            <div class="kpi-label">Bot Latency</div>
+          </div>
+        </div>
+
+        <!-- ===== System panel ===== -->
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2><i class="fa-solid fa-heart-pulse"></i> System health</h2>
+              <div class="desc">Bot process (heartbeat file) &amp; dashboard host machine — real values, refreshed every 30s by the bot.</div>
+            </div>
+            <span class="text-muted" style="font-size:12px">Last heartbeat: <%= botStatus.updatedAt ? new Date(botStatus.updatedAt).toLocaleTimeString() : 'never' %></span>
+          </div>
+          <div class="grid cols-4">
+            <div>
+              <label class="mt-0">Bot uptime</label>
+              <div style="font-family:var(--font-mono);font-size:15px"><%= Math.floor(botStatus.uptimeSeconds/3600) %>h <%= Math.floor((botStatus.uptimeSeconds%3600)/60) %>m</div>
+            </div>
+            <div>
+              <label class="mt-0">Bot memory (RSS)</label>
+              <div style="font-family:var(--font-mono);font-size:15px"><%= botStatus.rssMB %> MB</div>
+            </div>
+            <div>
+              <label class="mt-0">Dashboard uptime</label>
+              <div style="font-family:var(--font-mono);font-size:15px"><%= Math.floor(stats.dashboardUptimeSeconds/3600) %>h <%= Math.floor((stats.dashboardUptimeSeconds%3600)/60) %>m</div>
+            </div>
+            <div>
+              <label class="mt-0">Storage (JSON files)</label>
+              <div style="font-family:var(--font-mono);font-size:15px">Local · Operational</div>
+            </div>
+          </div>
+          <div class="grid cols-2" style="margin-top:20px">
+            <div>
+              <label class="mt-0">Host memory (<%= stats.hostMemUsedPct %>% used, <%= stats.hostMemFreeGB %>GB free of <%= stats.hostMemTotalGB %>GB)</label>
+              <div class="progress-track"><div class="progress-fill" style="width:<%= stats.hostMemUsedPct %>%"></div></div>
+            </div>
+            <div>
+              <label class="mt-0">Host CPU load avg (<%= stats.hostCpuCores %> cores)</label>
+              <div class="progress-track"><div class="progress-fill" style="width:<%= Math.min(100, stats.hostLoadAvg * 100 / stats.hostCpuCores) %>%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Analytics ===== -->
+        <div id="analytics">
+          <div class="panel-head" style="margin:8px 0 16px"><h2><i class="fa-solid fa-chart-line"></i> Analytics</h2></div>
+          <div class="grid charts" style="margin-bottom:24px">
+            <div class="chart-box">
+              <h3>Commands Executed — Last 14 Days</h3>
+              <canvas id="commandsChart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h3>Most Used Commands</h3>
+              <canvas id="topCommandsChart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h3>Moderation Actions by Type</h3>
+              <canvas id="modActionsChart"></canvas>
+            </div>
+            <div class="chart-box">
+              <h3>Tickets — Open vs. Closed</h3>
+              <canvas id="ticketsChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Server management ===== -->
+        <div class="panel" id="servers">
+          <div class="panel-head">
+            <div><h2><i class="fa-solid fa-server"></i> Server management</h2><div class="desc">Every server Vaylex is currently in.</div></div>
+            <div class="search-bar"><span class="ic"><i class="fa-solid fa-magnifying-glass"></i></span><input type="text" placeholder="Search servers…" data-filter-target="tbody tr"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Server</th><th>Members</th><th>Tickets</th><th>Mod actions</th><th>Commands used</th><th></th></tr></thead>
+              <tbody>
+                <% guilds.forEach(g => { %>
+                  <tr data-search="<%= g.name %>">
+                    <td><span class="flex gap-8"><span class="server-icon" style="width:26px;height:26px;font-size:11px;border-radius:6px"><% if (g.icon) { %><img src="<%= g.icon %>" alt=""><% } else { %><%= g.name.charAt(0).toUpperCase() %><% } %></span><%= g.name %></span></td>
+                    <td><%= (g.memberCount || 0).toLocaleString() %></td>
+                    <td><%= stats.mostActiveServers.find(s => s.id === g.id)?.ticketCount ?? 0 %></td>
+                    <td><%= stats.mostActiveServers.find(s => s.id === g.id)?.modActionCount ?? 0 %></td>
+                    <td><%= stats.mostActiveServers.find(s => s.id === g.id)?.commandCount ?? 0 %></td>
+                    <td><a class="btn ghost sm" href="/dashboard/<%= g.id %>">Manage <i class="fa-solid fa-arrow-right"></i></a></td>
+                  </tr>
+                <% }) %>
+                <% if (!guilds.length) { %>
+                  <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">No servers yet.</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const purple = '#a855f7', purpleDim = 'rgba(168,85,247,0.25)', gridColor = 'rgba(255,255,255,0.05)', textColor = '#9a8fc2';
+    Chart.defaults.color = textColor;
+    Chart.defaults.font.family = 'Inter';
+
+    new Chart(document.getElementById('commandsChart'), {
+      type: 'line',
+      data: {
+        labels: <%- JSON.stringify(stats.commandsPerDay.map(d => d.day.slice(5))) %>,
+        datasets: [{ label: 'Commands', data: <%- JSON.stringify(stats.commandsPerDay.map(d => d.count)) %>, borderColor: purple, backgroundColor: purpleDim, fill: true, tension: 0.35, pointRadius: 2 }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor } }, y: { beginAtZero: true, grid: { color: gridColor } } } }
+    });
+
+    const topCommands = <%- JSON.stringify(stats.topCommands) %>;
+    new Chart(document.getElementById('topCommandsChart'), {
+      type: 'bar',
+      data: { labels: topCommands.map(c => '/' + c.name), datasets: [{ data: topCommands.map(c => c.count), backgroundColor: purple, borderRadius: 6 }] },
+      options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: gridColor } }, y: { grid: { display: false } } } }
+    });
+
+    const actionCounts = <%- JSON.stringify(stats.actionCounts) %>;
+    new Chart(document.getElementById('modActionsChart'), {
+      type: 'bar',
+      data: { labels: Object.keys(actionCounts), datasets: [{ data: Object.values(actionCounts), backgroundColor: '#c084fc', borderRadius: 6 }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: gridColor } } } }
+    });
+
+    new Chart(document.getElementById('ticketsChart'), {
+      type: 'doughnut',
+      data: { labels: ['Open', 'Total'], datasets: [{ data: [<%= stats.openTickets %>, <%= Math.max(stats.totalTickets - stats.openTickets, 0) %>], backgroundColor: ['#a855f7', '#3b2a5e'], borderColor: '#120e1e', borderWidth: 3 }] },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

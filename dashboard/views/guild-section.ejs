@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { pageTitle: (guild ? guild.name : 'Server') + ' — ' + (sections.find(s => s.key === section) || {}).label }) %>
+  <% if (section === 'overview') { %><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script><% } %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar-guild', { guild, guildId, sections, section }) %>
+    <div class="main">
+      <%- include('partials/topbar', { breadcrumb: '<a href="/dashboard">Servers</a> / <a href="/dashboard/' + guildId + '/overview">' + (guild ? guild.name : guildId) + '</a> / ' + (sections.find(s => s.key === section) || {}).label, user }) %>
+
+      <div class="page">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Server settings</div>
+            <h1><i class="<%= (sections.find(s => s.key === section) || {}).icon %>"></i> <%= (sections.find(s => s.key === section) || {}).label %></h1>
+          </div>
+        </div>
+
+        <%- include('sections/' + section) %>
+      </div>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

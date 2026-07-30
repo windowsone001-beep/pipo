@@ -1,0 +1,30 @@
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <a href="/dashboard"><%- include('brand') %></a>
+  </div>
+
+  <div class="sidebar-context">
+    <img src="<%= guild.icon || 'https://cdn.discordapp.com/embed/avatars/1.png' %>" alt="">
+    <div style="min-width:0">
+      <div class="name"><%= guild.name %></div>
+      <div class="sub"><%= (guild.memberCount || 0).toLocaleString() %> members</div>
+    </div>
+  </div>
+
+  <% const groups = [...new Set(sections.map(s => s.group))]; %>
+  <% groups.forEach(group => { %>
+    <div class="nav-group">
+      <div class="nav-label"><%= group %></div>
+      <% sections.filter(s => s.group === group).forEach(s => { %>
+        <a class="nav-link <%= section === s.key ? 'active' : '' %>" href="/dashboard/<%= guildId %>/<%= s.key %>">
+          <span class="ic"><i class="<%= s.icon %>"></i></span> <%= s.label %>
+        </a>
+      <% }) %>
+    </div>
+  <% }) %>
+
+  <div class="nav-group" style="margin-top:auto">
+    <a class="nav-link" href="/dashboard"><span class="ic"><i class="fa-solid fa-arrow-left"></i></span> All servers</a>
+  </div>
+</aside>
+<div class="sidebar-backdrop"></div>

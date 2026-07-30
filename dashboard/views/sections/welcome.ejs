@@ -1,0 +1,34 @@
+<p class="section-desc">Sent automatically when someone joins or leaves. Supports <code>{user} {mention} {server} {memberCount}</code>.</p>
+<form method="POST" action="/api/guilds/<%= guildId %>/welcome">
+  <div class="panel">
+    <div class="toggle-row">
+      <div><div class="label">Welcome messages</div><div class="desc">Send a message when someone joins</div></div>
+      <input type="checkbox" class="switch" name="welcomeEnabled" <%= cfg.welcome.enabled ? 'checked' : '' %>>
+    </div>
+    <label>Welcome channel ID</label>
+    <input type="text" name="welcomeChannel" value="<%= cfg.welcome.channel || '' %>" placeholder="Channel ID">
+    <label>Welcome message</label>
+    <textarea name="welcomeMessage"><%= cfg.welcome.message %></textarea>
+    <div class="toggle-row" style="margin-top:14px">
+      <div><div class="label">Also DM new members</div></div>
+      <input type="checkbox" class="switch" name="welcomeDm" <%= cfg.welcome.dmEnabled ? 'checked' : '' %>>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toggle-row">
+      <div><div class="label">Goodbye messages</div><div class="desc">Send a message when someone leaves</div></div>
+      <input type="checkbox" class="switch" name="goodbyeEnabled" <%= cfg.goodbye.enabled ? 'checked' : '' %>>
+    </div>
+    <label>Goodbye channel ID</label>
+    <input type="text" name="goodbyeChannel" value="<%= cfg.goodbye.channel || '' %>" placeholder="Channel ID">
+    <label>Goodbye message</label>
+    <textarea name="goodbyeMessage"><%= cfg.goodbye.message %></textarea>
+  </div>
+
+  <div class="empty-state" style="text-align:left;padding:20px 22px">
+    <p style="margin:0"><strong style="color:var(--text)"><i class="fa-solid fa-image"></i> Welcome cards / images:</strong> not built into the bot yet — <code>welcome.bannerEnabled</code> exists as a config flag ready to wire up when this ships. Text welcome messages above work today.</p>
+  </div>
+
+  <div class="form-actions"><button class="btn" type="submit">Save welcome &amp; goodbye</button></div>
+</form>

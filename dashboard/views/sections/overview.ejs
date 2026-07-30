@@ -1,0 +1,52 @@
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-ticket"></i></div></div><div class="kpi-value"><%= stats.openTickets %></div><div class="kpi-label">Open Tickets</div></div>
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-ticket"></i></div></div><div class="kpi-value"><%= stats.totalTickets %></div><div class="kpi-label">Total Tickets</div></div>
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div></div><div class="kpi-value"><%= stats.totalWarnings %></div><div class="kpi-label">Warnings</div></div>
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-gavel"></i></div></div><div class="kpi-value"><%= stats.totalModActions %></div><div class="kpi-label">Mod Actions</div></div>
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-gift"></i></div></div><div class="kpi-value"><%= stats.activeGiveaways %></div><div class="kpi-label">Active Giveaways</div></div>
+  <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-file-signature"></i></div></div><div class="kpi-value"><%= stats.pendingApplications %></div><div class="kpi-label">Pending Apps</div></div>
+</div>
+
+<div class="grid charts">
+  <div class="chart-box"><h3>Ticket Volume &mdash; Last 14 Days</h3><canvas id="ticketTrendChart"></canvas></div>
+  <div class="chart-box"><h3>Ticket Status</h3><canvas id="ticketStatusChart"></canvas></div>
+  <div class="chart-box"><h3>Moderation Actions by Type</h3><canvas id="modActionsChart"></canvas></div>
+  <div class="chart-box"><h3>Applications</h3><canvas id="applicationsChart"></canvas></div>
+</div>
+
+<script>
+  const purple = '#a855f7';
+  const purpleDim = 'rgba(168, 85, 247, 0.25)';
+  const gridColor = 'rgba(255,255,255,0.05)';
+  const textColor = '#9a8fc2';
+  Chart.defaults.color = textColor;
+  Chart.defaults.font.family = 'Inter';
+
+  new Chart(document.getElementById('ticketTrendChart'), {
+    type: 'line',
+    data: {
+      labels: <%- JSON.stringify(stats.ticketTrend.days.map(d => d.slice(5))) %>,
+      datasets: [{ label: 'Tickets Opened', data: <%- JSON.stringify(stats.ticketTrend.counts) %>, borderColor: purple, backgroundColor: purpleDim, fill: true, tension: 0.35, pointRadius: 2 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor } }, y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: gridColor } } } }
+  });
+
+  new Chart(document.getElementById('ticketStatusChart'), {
+    type: 'doughnut',
+    data: { labels: ['Open', 'Closed'], datasets: [{ data: [<%= stats.openTickets %>, <%= stats.closedTickets %>], backgroundColor: ['#a855f7', '#3b2a5e'], borderColor: '#120e1e', borderWidth: 3 }] },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  const actionCounts = <%- JSON.stringify(stats.actionCounts) %>;
+  new Chart(document.getElementById('modActionsChart'), {
+    type: 'bar',
+    data: { labels: Object.keys(actionCounts), datasets: [{ label: 'Count', data: Object.values(actionCounts), backgroundColor: '#a855f7', borderRadius: 6 }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: gridColor } } } }
+  });
+
+  new Chart(document.getElementById('applicationsChart'), {
+    type: 'doughnut',
+    data: { labels: ['Pending', 'Reviewed'], datasets: [{ data: [<%= stats.pendingApplications %>, <%= stats.totalApplications - stats.pendingApplications %>], backgroundColor: ['#c084fc', '#3b2a5e'], borderColor: '#120e1e', borderWidth: 3 }] },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+</script>

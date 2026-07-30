@@ -1,0 +1,18 @@
+<p class="section-desc">Issued with <code>/warn</code>, cleared with <code>/warnings clear</code>.</p>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>User</th><th>Moderator</th><th>Reason</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>
+      <% recentWarnings.forEach(w => { %>
+        <tr>
+          <td><%= w.userId %></td>
+          <td><%= w.moderatorId %></td>
+          <td><%= w.reason %></td>
+          <td><span class="badge <%= w.active ? 'warning' : 'neutral' %>"><%= w.active ? 'Active' : 'Cleared' %></span></td>
+          <td><%= w.createdAt ? new Date(w.createdAt).toLocaleDateString() : '—' %></td>
+        </tr>
+      <% }) %>
+      <% if (!recentWarnings.length) { %><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No warnings yet.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
